@@ -1,0 +1,133 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+using namespace std;
+
+int main() {
+
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int at[n], bt[n], rt[n];
+    int ct[n], tat[n], wt[n];
+
+    for(int i = 0; i < n; i++) {
+
+        cout << "\nP" << i + 1 << endl;
+
+        cout << "Arrival Time: ";
+        cin >> at[i];
+
+        cout << "Burst Time: ";
+        cin >> bt[i];
+
+        rt[i] = bt[i];
+    }
+
+    int complete = 0;
+    int time = 0;
+
+    vector<int> ganttProcess;
+
+    while(complete < n) {
+
+        int shortest = -1;
+
+        
+        for(int i = 0; i < n; i++) {
+
+            if(at[i] <= time && rt[i] > 0) {
+
+                if(shortest == -1 || rt[i] < rt[shortest]) {
+                    shortest = i;
+                }
+            }
+        }
+
+        
+        if(shortest == -1) {
+            time++;
+            continue;
+        }
+
+        ganttProcess.push_back(shortest + 1);
+
+        rt[shortest]--;
+        time++;
+
+        
+        if(rt[shortest] == 0) {
+
+            complete++;
+
+            ct[shortest] = time;
+            tat[shortest] = ct[shortest] - at[shortest];
+            wt[shortest] = tat[shortest] - bt[shortest];
+        }
+    }
+
+    float totalWT = 0, totalTAT = 0, totalBT = 0;
+
+    cout << "\n\nSJF Preemptive (SRTF)\n\n";
+
+    cout << left
+         << setw(8) << "PID"
+         << setw(8) << "AT"
+         << setw(8) << "BT"
+         << setw(8) << "CT"
+         << setw(8) << "TAT"
+         << setw(8) << "WT"
+         << endl;
+
+  
+
+    for(int i = 0; i < n; i++) {
+
+        totalWT += wt[i];
+        totalTAT += tat[i];
+        totalBT += bt[i];
+
+        cout << left
+             << setw(8) << i + 1
+             << setw(8) << at[i]
+             << setw(8) << bt[i]
+             << setw(8) << ct[i]
+             << setw(8) << tat[i]
+             << setw(8) << wt[i]
+             << endl;
+    }
+
+    float avgWT = totalWT / n;
+    float avgTAT = totalTAT / n;
+
+    float throughput = (float)n / time;
+    float efficiency = (totalBT / time) * 100;
+
+    cout << fixed << setprecision(2);
+
+    cout << "\nAverage Waiting Time    = " << avgWT << endl;
+    cout << "Average Turnaround Time = " << avgTAT << endl;
+    cout << "Throughput              = " << throughput << endl;
+    cout << "CPU Efficiency          = " << efficiency << "%" << endl;
+
+
+    cout << "\nGantt Chart:\n";
+
+    if(!ganttProcess.empty()) {
+
+        cout << "|P" << ganttProcess[0];
+
+        for(int i = 1; i < ganttProcess.size(); i++) {
+
+            if(ganttProcess[i] != ganttProcess[i - 1]) {
+                cout << "|P" << ganttProcess[i];
+            }
+        }
+
+        cout << "|\n";
+    }
+
+    return 0;
+}
+
