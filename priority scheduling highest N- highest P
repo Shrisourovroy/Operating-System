@@ -1,0 +1,121 @@
+//non preemptive
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[n], at[n], bt[n], pr[n];
+    int ct[n], tat[n], wt[n];
+    bool completed[n] = {false};
+
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+
+        cout << "Enter Arrival Time, Burst Time and Priority for P"
+             << pid[i] << ": ";
+        cin >> at[i] >> bt[i] >> pr[i];
+    }
+
+    int currentTime = 0;
+    int completedCount = 0;
+    int totalBT = 0;
+
+    float totalWT = 0;
+    float totalTAT = 0;
+
+    // Gantt Chart
+    int ganttPid[n];
+    int k = 0;
+
+    while(completedCount < n) {
+
+        int idx = -1;
+        int highestPriority = -1;
+
+        // Find highest priority process
+        for(int i = 0; i < n; i++) {
+
+            if(!completed[i] && at[i] <= currentTime) {
+
+                // Higher number = higher priority
+                if(pr[i] > highestPriority) {
+                    highestPriority = pr[i];
+                    idx = i;
+                }
+            }
+        }
+
+        // If no process has arrived
+        if(idx == -1) {
+            currentTime++;
+        }
+        else {
+
+            wt[idx] = currentTime - at[idx];
+
+            currentTime += bt[idx];
+
+            ct[idx] = currentTime;
+
+            tat[idx] = ct[idx] - at[idx];
+
+            totalWT += wt[idx];
+            totalTAT += tat[idx];
+            totalBT += bt[idx];
+
+            completed[idx] = true;
+            completedCount++;
+
+            // Store process for Gantt Chart
+            ganttPid[k] = pid[idx];
+            k++;
+        }
+    }
+
+    // Gantt Chart
+    cout << "\nGantt Chart: ";
+
+    for(int i = 0; i < k; i++) {
+        cout << "| P" << ganttPid[i] << " ";
+    }
+
+    cout << "|\n";
+
+    // Process Table
+    cout << "\nProcess\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << pr[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    // Average WT and TAT
+    float avgWT = totalWT / n;
+    float avgTAT = totalTAT / n;
+
+    // Throughput and Efficiency
+    int totalTime = currentTime;
+
+    float throughput = (float)n / totalTime;
+
+    float efficiency = ((float)totalBT / totalTime) * 100;
+
+    cout << "\nAverage Waiting Time = " << avgWT << endl;
+
+    cout << "Average Turnaround Time = " << avgTAT << endl;
+
+    cout << "Throughput = " << throughput
+         << " processes/unit time" << endl;
+
+    cout << "Efficiency = " << efficiency << "%" << endl;
+
+    return 0;
+}
