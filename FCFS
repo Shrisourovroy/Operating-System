@@ -1,0 +1,73 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[n], at[n], bt[n], wt[n], tat[n];
+
+    int total_bt = 0;
+
+    for (int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "Enter Arrival Time and Burst Time for Process " << pid[i] << ": ";
+        cin >> at[i] >> bt[i];
+
+        total_bt += bt[i];
+    }
+
+
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (at[j] > at[j+1]) {
+                swap(at[j], at[j+1]);
+                swap(bt[j], bt[j+1]);
+                swap(pid[j], pid[j+1]);
+            }
+        }
+    }
+
+    int time = 0;
+    float total_wt = 0;
+
+    cout << "\nGantt Chart: ";
+    for (int i = 0; i < n; i++) {
+        if (time < at[i])
+            time = at[i];
+
+        wt[i] = time - at[i];
+        tat[i] = wt[i] + bt[i];
+
+        time += bt[i];
+
+        total_wt += wt[i];
+
+        cout << "| P" << pid[i] << " ";
+    }
+    cout << "|\n";
+
+    cout << "\nProcess\tAT\tBT\tWT\tTAT\n";
+    for (int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t" << at[i] << "\t"
+             << bt[i] << "\t" << wt[i] << "\t"
+             << tat[i] << "\n";
+    }
+
+    cout << "\nAverage Waiting Time = " << total_wt / n << endl;
+
+
+    int total_time = time - at[0];
+
+    float throughput = (float)n / total_time;
+    float efficiency = ((float)total_bt / total_time) * 100;
+
+    cout << "Throughput = " << throughput
+         << " processes/unit time" << endl;
+
+    cout << "Efficiency = " << efficiency
+         << "%" << endl;
+
+    return 0;
+}
