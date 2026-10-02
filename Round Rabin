@@ -1,0 +1,156 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int main() {
+
+    int n, tq;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int at[n], bt[n], rt[n];
+    int ct[n], tat[n], wt[n];
+
+    for(int i = 0; i < n; i++) {
+
+        cout << "\nP" << i + 1 << endl;
+
+        cout << "Arrival Time: ";
+        cin >> at[i];
+
+        cout << "Burst Time: ";
+        cin >> bt[i];
+
+        rt[i] = bt[i];
+    }
+
+    cout << "\nEnter Time Quantum: ";
+    cin >> tq;
+
+    queue<int> q;
+    vector<int> gantt;
+
+    int time = 0;
+    int complete = 0;
+
+    bool added[n] = {false};
+
+    while(complete < n) {
+
+
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !added[i]) {
+                q.push(i);
+                added[i] = true;
+            }
+        }
+
+
+        if(q.empty()) {
+            time++;
+            continue;
+        }
+
+        int p = q.front();
+        q.pop();
+
+        gantt.push_back(p + 1);
+
+
+        int runTime = min(tq, rt[p]);
+
+        rt[p] -= runTime;
+        time += runTime;
+
+
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !added[i]) {
+                q.push(i);
+                added[i] = true;
+            }
+        }
+
+
+        if(rt[p] == 0) {
+
+            complete++;
+
+            ct[p] = time;
+            tat[p] = ct[p] - at[p];
+            wt[p] = tat[p] - bt[p];
+
+        } else {
+
+
+            q.push(p);
+        }
+    }
+
+    float totalWT = 0;
+    float totalTAT = 0;
+    float totalBT = 0;
+
+    cout << "\n\nRound Robin Scheduling\n\n";
+
+    cout << left
+         << setw(8) << "PID"
+         << setw(8) << "AT"
+         << setw(8) << "BT"
+         << setw(8) << "CT"
+         << setw(8) << "TAT"
+         << setw(8) << "WT"
+         << endl;
+
+
+
+    for(int i = 0; i < n; i++) {
+
+        totalWT += wt[i];
+        totalTAT += tat[i];
+        totalBT += bt[i];
+
+        cout << left
+             << setw(8) << i + 1
+             << setw(8) << at[i]
+             << setw(8) << bt[i]
+             << setw(8) << ct[i]
+             << setw(8) << tat[i]
+             << setw(8) << wt[i]
+             << endl;
+    }
+
+    float avgWT = totalWT / n;
+    float avgTAT = totalTAT / n;
+
+
+    float throughput = (float)n / time;
+
+
+    float efficiency = (totalBT / time) * 100;
+
+    cout << fixed << setprecision(2);
+
+    cout << "\nAverage Waiting Time    = " << avgWT << endl;
+    cout << "Average Turnaround Time = " << avgTAT << endl;
+    cout << "Throughput              = " << throughput << endl;
+    cout << "CPU Efficiency          = " << efficiency << "%" << endl;
+
+
+    cout << "\nGantt Chart:\n";
+
+    if(!gantt.empty()) {
+
+        cout << "|P" << gantt[0];
+
+        for(int i = 1; i < gantt.size(); i++) {
+            cout << "|P" << gantt[i];
+        }
+
+        cout << "|\n";
+    }
+
+    return 0;
+}
