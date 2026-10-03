@@ -1,0 +1,82 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cout<<"Enter number of page: ";
+    cin>>n;
+    cout<<"Enter the reference string : ";
+    int page[n];
+    for(int i=0; i<n; i++){
+        cin>>page[i];
+    }
+    int f;
+    cout<<"Enter the frame number: ";
+    cin>>f;
+    int frame[f];
+    for(int i=0; i<f; i++){
+        frame[i]=-1;
+    }
+
+    int hit =0, fault = 0;
+
+    for(int i=0; i<n; i++){
+        int found = 0;
+        for(int j=0; j<f; j++){
+            if(frame[j]==page[i]){
+                found = 1;
+                hit++;
+                break;
+            }
+
+        }
+
+        if(found == 0){
+            int pos = -1;
+            for(int j=0; j<f; j++){
+                if(frame[j] == -1){
+                    pos = j;
+                    break;
+                }
+            }
+
+            if(pos == -1){
+                int farthest = -1;
+                for(int j = 0; j<f; j++){
+                   int k;
+                   for(k = i+1; k<n; k++){
+                        if(frame[j] == page[k]){
+                            break;
+                        }
+                   }
+                   if(k==n){
+                    pos = j;
+                    break;
+                   }
+                   if(k>farthest){
+                    farthest = k;
+                    pos = j;
+                   }
+
+                }
+            }
+            frame[pos] = page[i];
+            fault++;
+        }
+
+        cout<<page[i]<<": ";
+        for(int j=0; j<f; j++){
+                if(frame[j]==-1){
+                    cout<<"_ ";
+                }
+                else cout<<frame[j]<<" ";
+        }
+        cout<<endl;
+
+    }
+
+    cout<<"Hits : "<<hit<<endl;
+    cout<<"Fault : "<<fault<<endl;
+
+ return 0;
+}
