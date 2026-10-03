@@ -1,0 +1,64 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cout<<"Enter the number of page: ";
+    cin>>n;
+    int page[n];
+    cout<<"Enter the reference string: ";
+    for(int i=0; i<n; i++){
+        cin>>page[i];
+    }
+    int f;
+    cout<<"Enter the frame number: ";
+    cin>>f;
+    int frame[f];
+    for(int i=0; i<f; i++){
+        frame[i]=-1;
+    }
+
+    int fault = 0;
+    int hit = 0;
+    int index = 0;
+
+    for(int i=0; i<n; i++){
+        bool found = false;
+
+        for(int j=0; j<f; j++){
+            if(frame[j] == page[i]){
+                found = true;
+                hit++;
+                break;
+            }
+        }
+        if(!found){
+            frame[index] = page[i];
+            index = (index+1)%f;
+            fault++;
+        }
+
+        cout<<page[i]<<": ";
+        for(int j=0; j<f; j++){
+            if(frame[j] == -1){
+                cout<<"- ";
+            }
+            else cout<<frame[j]<<" ";
+        }
+        if(found){
+            cout<<"Hit";
+        }
+        else cout<<"Fault";
+
+        cout<<endl;
+
+    }
+
+    cout<<"Number of page fault: "<<fault<<endl;
+    cout<<"Number of page HIT : "<<hit<<endl;
+
+    cout<<"Fault ratio: "<<(float)fault/n<<endl;
+    cout<<"Hit ratio: "<<(float)hit/n;
+
+    return 0;
+}
